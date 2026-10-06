@@ -9,22 +9,30 @@ import type { DiagramMeta, SatteriReladrawOptions } from "./types.js";
 import { parseMeta, renderDefaultError, renderReladraw } from "./utils.js";
 
 export type {
+  AutoThemeOption,
   DiagramMeta,
   ReladrawMode,
   ReladrawOnError,
   SatteriReladrawOptions,
 } from "./types.js";
 export {
+  applyTransparency,
   escapeHtml,
+  hasDiagramTheme,
+  isAutoTheme,
+  makeThemeTransparent,
   parseMeta,
   renderDefaultError,
   renderReladraw,
   resolveTheme,
+  resolveThemePair,
 } from "./utils.js";
 export {
+  AUTO_THEME_CSS,
   BUILTIN_THEMES,
   BUILTIN_THEME_NAMES,
   DEFAULT_ADDITIONAL_THEMES,
+  THEME_PAIRS,
   createAccent,
   defineTheme,
   githubDark,
@@ -32,8 +40,11 @@ export {
   mixColors,
   oxocarbonDark,
   oxocarbonLight,
+  registerTheme,
+  registerThemes,
   type Accent,
   type ThemeDefinition,
+  type ThemePair,
 } from "./themes.js";
 export {
   DARK_THEME,
@@ -57,6 +68,7 @@ export interface ReladrawDiagnostic {
 declare module "satteri" {
   interface DataMap {
     reladrawDiagnostics?: ReladrawDiagnostic[];
+    reladrawStylesInjected?: boolean;
   }
 }
 
@@ -64,7 +76,7 @@ declare module "satteri" {
  * Sätteri MDAST plugin for reladraw diagrams.
  *
  * Intercepts code blocks matching `languages` (defaulting to `reladraw`)
- * and transforms them into inline SVG or `<reladraw-diagram>` elements.
+ * and transforms them into inline SVG, auto-themed dual SVGs, or `<reladraw-diagram>` elements.
  *
  * @example
  * ```ts
@@ -72,7 +84,7 @@ declare module "satteri" {
  * import { satteriReladraw } from "satteri-reladraw";
  *
  * const { html } = await markdownToHtml(source, {
- *   mdastPlugins: [satteriReladraw({ theme: "dark" })],
+ *   mdastPlugins: [satteriReladraw({ theme: "auto" })],
  * });
  * ```
  */
@@ -89,9 +101,18 @@ export function satteriReladraw(options: SatteriReladrawOptions = {}): MdastPlug
       }
 
       const meta: DiagramMeta = parseMeta(node.meta);
+      const shouldInjectStyles = options.injectStyles !== false && !ctx.data.reladrawStylesInjected;
 
       try {
-        const output = renderReladraw(node.value, meta, options);
+        const output = renderReladraw(node.value, meta, {
+          ...options,
+          injectStyles: shouldInjectStyles,
+        });
+
+        if (output.includes("<style data-reladraw-styles>")) {
+          ctx.data.reladrawStylesInjected = true;
+        }
+
         return { raw: output, mdxExpressions: false };
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
@@ -167,9 +188,19 @@ export function satteriReladrawHast(options: SatteriReladrawOptions = {}): HastP
 
         const codeText = ctx.textContent(codeChild);
         const meta: DiagramMeta = {};
+        const shouldInjectStyles =
+          options.injectStyles !== false && !ctx.data.reladrawStylesInjected;
 
         try {
-          const output = renderReladraw(codeText, meta, options);
+          const output = renderReladraw(codeText, meta, {
+            ...options,
+            injectStyles: shouldInjectStyles,
+          });
+
+          if (output.includes("<style data-reladraw-styles>")) {
+            ctx.data.reladrawStylesInjected = true;
+          }
+
           ctx.replaceNode(node, {
             type: "raw",
             value: output,

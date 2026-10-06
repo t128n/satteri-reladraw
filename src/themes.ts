@@ -1,4 +1,4 @@
-import { THEMES, type Theme } from "reladraw";
+import { THEMES, THEME_NAMES, type Theme } from "reladraw";
 
 export type Accent = Theme["primary"];
 
@@ -172,6 +172,17 @@ export const DEFAULT_ADDITIONAL_THEMES: Readonly<Record<string, Theme>> = {
   "oxocarbon-light": oxocarbonLight,
 };
 
+const mutableThemes = THEMES as Record<string, Theme>;
+const mutableThemeNames = THEME_NAMES as string[];
+
+// Auto-register default additional themes into reladraw's runtime dictionaries
+for (const [name, theme] of Object.entries(DEFAULT_ADDITIONAL_THEMES)) {
+  mutableThemes[name] = theme;
+  if (!mutableThemeNames.includes(name)) {
+    mutableThemeNames.push(name);
+  }
+}
+
 /**
  * All built-in themes available out-of-the-box (reladraw core + satteri-reladraw additions).
  */
@@ -184,3 +195,55 @@ export const BUILTIN_THEMES: Readonly<Record<string, Theme>> = {
  * List of all available built-in theme names.
  */
 export const BUILTIN_THEME_NAMES: readonly string[] = Object.keys(BUILTIN_THEMES);
+
+/**
+ * A pair of themes used for auto light/dark switching.
+ */
+export interface ThemePair {
+  dark: string | Theme | ThemeDefinition;
+  light: string | Theme | ThemeDefinition;
+}
+
+/**
+ * Preset theme pairs for automatic dark/light mode switching.
+ */
+export const THEME_PAIRS: Readonly<Record<string, ThemePair>> = {
+  auto: { dark: "dark", light: "light" },
+  default: { dark: "dark", light: "light" },
+  github: { dark: "github-dark", light: "github-light" },
+  oxocarbon: { dark: "oxocarbon-dark", light: "oxocarbon-light" },
+  catppuccin: { dark: "catppuccin-mocha", light: "catppuccin-latte" },
+  solarized: { dark: "solarized-dark", light: "solarized-light" },
+  gruvbox: { dark: "gruvbox-dark", light: "gruvbox-light" },
+  "high-contrast": { dark: "high-contrast-dark", light: "high-contrast-light" },
+};
+
+/**
+ * Responsive CSS for auto-theming diagrams.
+ * Supports Starlight (`[data-theme='dark']` / `[data-theme='light']`),
+ * Tailwind (`.dark` / `.light`), and system `@media (prefers-color-scheme: dark)`.
+ */
+export const AUTO_THEME_CSS =
+  '.reladraw-auto{display:block}.reladraw-auto .reladraw-dark{display:none}.reladraw-auto .reladraw-light{display:block}@media (prefers-color-scheme:dark){.reladraw-auto .reladraw-dark{display:block}.reladraw-auto .reladraw-light{display:none}}:root[data-theme="dark"] .reladraw-auto .reladraw-dark,html[data-theme="dark"] .reladraw-auto .reladraw-dark,.dark .reladraw-auto .reladraw-dark,[data-theme="dark"] .reladraw-auto .reladraw-dark{display:block!important}:root[data-theme="dark"] .reladraw-auto .reladraw-light,html[data-theme="dark"] .reladraw-auto .reladraw-light,.dark .reladraw-auto .reladraw-light,[data-theme="dark"] .reladraw-auto .reladraw-light{display:none!important}:root[data-theme="light"] .reladraw-auto .reladraw-dark,html[data-theme="light"] .reladraw-auto .reladraw-dark,.light .reladraw-auto .reladraw-dark,[data-theme="light"] .reladraw-auto .reladraw-dark{display:none!important}:root[data-theme="light"] .reladraw-auto .reladraw-light,html[data-theme="light"] .reladraw-auto .reladraw-light,.light .reladraw-auto .reladraw-light,[data-theme="light"] .reladraw-auto .reladraw-light{display:block!important}.reladraw svg{max-width:100%;height:auto}';
+
+/**
+ * Registers a custom theme into reladraw's runtime dictionaries so that
+ * in-diagram `diagram theme: <name>` statements and code fence `theme="<name>"` resolve it.
+ */
+export function registerTheme(name: string, theme: Theme | ThemeDefinition): Theme {
+  const resolved = defineTheme(theme);
+  mutableThemes[name] = resolved;
+  if (!mutableThemeNames.includes(name)) {
+    mutableThemeNames.push(name);
+  }
+  return resolved;
+}
+
+/**
+ * Registers multiple custom themes into reladraw's runtime dictionaries.
+ */
+export function registerThemes(themes: Record<string, Theme | ThemeDefinition>): void {
+  for (const [name, theme] of Object.entries(themes)) {
+    registerTheme(name, theme);
+  }
+}

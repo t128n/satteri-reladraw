@@ -7,18 +7,21 @@ description: Complete options reference for satteri-reladraw.
 
 ## Plugin Options
 
-| Option           | Type                                       | Default        | Description                                                           |
-| :--------------- | :----------------------------------------- | :------------- | :-------------------------------------------------------------------- |
-| `theme`          | `string \| Theme \| ThemeDefinition`       | `undefined`    | Default theme name, `Theme` object, or `ThemeDefinition`.             |
-| `themes`         | `Record<string, Theme \| ThemeDefinition>` | `undefined`    | Custom themes registry or overrides for built-in themes.              |
-| `mode`           | `'svg' \| 'element'`                       | `'svg'`        | `'svg'` pre-compiles to SVG; `'element'` emits `<reladraw-diagram>`.  |
-| `tag`            | `'div' \| 'figure' \| null`                | `'div'`        | Wrapper container tag. If `null`, no outer wrapper is added.          |
-| `className`      | `string \| null`                           | `'reladraw'`   | CSS class applied to the wrapper container.                           |
-| `languages`      | `string[]`                                 | `['reladraw']` | List of code fence languages to match (case-insensitive).             |
-| `onError`        | `'report' \| 'fallback' \| 'throw'`        | `'report'`     | Error handling behavior on syntax or layout failure.                  |
-| `renderError`    | `(err, code) => string`                    | `undefined`    | Custom HTML formatter for errors when `onError: 'report'`.            |
-| `resolveOptions` | `ResolveOptions`                           | `undefined`    | Layout options passed to reladraw solver (e.g. `margin`, `fontSize`). |
-| `renderOptions`  | `RenderOptions`                            | `undefined`    | Additional rendering options passed to reladraw renderer.             |
+| Option           | Type                                           | Default        | Description                                                                                      |
+| :--------------- | :--------------------------------------------- | :------------- | :----------------------------------------------------------------------------------------------- |
+| `theme`          | `string \| Theme \| ThemeDefinition \| 'auto'` | `undefined`    | Default theme name, Theme object, ThemeDefinition, 'auto', or ThemePair.                         |
+| `autoTheme`      | `boolean \| string \| ThemePair`               | `undefined`    | Enables dual dark/light auto-theming matching Astro/Starlight and system theme toggle.           |
+| `transparent`    | `boolean`                                      | `false`        | Renders the SVG canvas background transparent (`fill="none"`) instead of solid theme background. |
+| `injectStyles`   | `boolean`                                      | `true`         | Injects responsive auto-theming CSS into HTML output (set `false` if importing `theme.css`).     |
+| `themes`         | `Record<string, Theme \| ThemeDefinition>`     | `undefined`    | Custom themes registry or overrides for built-in themes.                                         |
+| `mode`           | `'svg' \| 'element'`                           | `'svg'`        | `'svg'` pre-compiles to SVG; `'element'` emits `<reladraw-diagram>`.                             |
+| `tag`            | `'div' \| 'figure' \| null`                    | `'div'`        | Wrapper container tag. If `null`, no outer wrapper is added.                                     |
+| `className`      | `string \| null`                               | `'reladraw'`   | CSS class applied to the wrapper container.                                                      |
+| `languages`      | `string[]`                                     | `['reladraw']` | List of code fence languages to match (case-insensitive).                                        |
+| `onError`        | `'report' \| 'fallback' \| 'throw'`            | `'report'`     | Error handling behavior on syntax or layout failure.                                             |
+| `renderError`    | `(err, code) => string`                        | `undefined`    | Custom HTML formatter for errors when `onError: 'report'`.                                       |
+| `resolveOptions` | `ResolveOptions`                               | `undefined`    | Layout options passed to reladraw solver (e.g. `margin`, `fontSize`).                            |
+| `renderOptions`  | `RenderOptions`                                | `undefined`    | Additional rendering options passed to reladraw renderer.                                        |
 
 ---
 
@@ -27,21 +30,23 @@ description: Complete options reference for satteri-reladraw.
 You can override options for individual diagrams directly in the code fence meta string:
 
 ````markdown
-```reladraw theme=nord tag=figure title="Data Flow" class="my-chart"
+```reladraw theme=github auto transparent tag=figure title="Data Flow"
 node a "Source"
 node b "Target" right of a
 edge a -> b
 ```
 ````
 
-| Meta Attribute        | Accepted Values                 | Example                                     |
-| :-------------------- | :------------------------------ | :------------------------------------------ |
-| `theme`               | Any valid theme name            | `theme=dracula`, `theme="catppuccin-mocha"` |
-| `mode`                | `svg`, `element`                | `mode=element`                              |
-| `tag`                 | `div`, `figure`, `none`, `null` | `tag=figure`                                |
-| `title`               | Any string                      | `title="System Flow"`                       |
-| `caption`             | Any string                      | `caption="Figure 2.1"`                      |
-| `class` / `className` | CSS classes                     | `class="custom-box shadow"`                 |
+| Meta Attribute        | Accepted Values                 | Example                                                          |
+| :-------------------- | :------------------------------ | :--------------------------------------------------------------- |
+| `theme`               | Any valid theme or pair name    | `theme=github`, `theme=oxocarbon`, `theme=dracula`, `theme=auto` |
+| `auto` / `autoTheme`  | `auto`, boolean, or pair name   | `auto`, `autoTheme=github`, `autoTheme="dark:light"`             |
+| `transparent`         | `transparent`, `true`, `false`  | `transparent`, `transparent=true`                                |
+| `mode`                | `svg`, `element`                | `mode=element`                                                   |
+| `tag`                 | `div`, `figure`, `none`, `null` | `tag=figure`                                                     |
+| `title`               | Any string                      | `title="System Flow"`                                            |
+| `caption`             | Any string                      | `caption="Figure 2.1"`                                           |
+| `class` / `className` | CSS classes                     | `class="custom-box shadow"`                                      |
 
 ---
 

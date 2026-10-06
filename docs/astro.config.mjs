@@ -8,7 +8,7 @@ export default defineConfig({
   base: "/satteri-reladraw",
   markdown: {
     processor: satteri({
-      mdastPlugins: [satteriReladraw({ theme: "dark" })],
+      mdastPlugins: [satteriReladraw({ theme: "auto" })],
     }),
   },
   integrations: [

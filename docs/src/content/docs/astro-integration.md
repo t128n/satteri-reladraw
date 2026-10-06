@@ -47,8 +47,9 @@ export default defineConfig({
     processor: satteri({
       mdastPlugins: [
         satteriReladraw({
-          // Default theme for diagrams (e.g., 'dark', 'light', 'catppuccin-mocha')
-          theme: "dark",
+          // Automatic dark/light theme switching with Starlight's theme toggle!
+          theme: "auto",
+          // Or use a preset pair like theme: "github" or theme: "oxocarbon"
           // Container tag ('div', 'figure', or null)
           tag: "div",
           // Class name applied to the container element
@@ -102,24 +103,22 @@ edge broker -> worker "consumes batch"
 edge worker -> db "bulk insert"
 ```
 
-## Customizing Starlight Theme Harmony
+## Automatic Starlight Theme Harmony
 
-You can match the diagram theme to Starlight's dark mode or light mode, or override the theme per code block using the `theme` meta tag:
+Starlight provides an integrated Dark / Light theme toggle in the header. `satteri-reladraw` seamlessly hooks into this:
 
-````markdown
-<!-- Override theme for a specific diagram -->
+- **Site-Wide Auto Theme**: Configure `satteriReladraw({ theme: "auto" })` to make all diagrams automatically adapt when readers toggle Starlight's theme.
+- **Preset Pairs**: Use `theme=github`, `theme=oxocarbon`, `theme=catppuccin`, or `theme=solarized` to switch between paired palettes.
+- **Pinned Themes**: Override individual diagrams with `theme=nord`, `theme=github-dark`, or `theme=github-light` to pin a fixed palette.
+- **Transparent Canvas**: Add `transparent` to remove background fills and let Starlight's page background show through.
 
-```reladraw theme=solarized-dark
-node a "Solarized"
-node b "Theme" right of a
-edge a -> b
-```
-````
+```reladraw theme=github title="Auto-Themed Starlight Diagram" tag=figure
+node source "User Input"
+node validator "Schema Validator" right of source
+node store "Persistent Store" right of validator
 
-```reladraw theme=solarized-dark
-node a "Solarized"
-node b "Theme" right of a
-edge a -> b
+edge source -> validator "payload"
+edge validator -> store "valid data"
 ```
 
 ## Client-Side Rendering with Web Component Mode

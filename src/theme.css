@@ -1,0 +1,57 @@
+/**
+ * Responsive CSS for satteri-reladraw diagrams with auto-theming support.
+ * Compatible with Astro Starlight, Tailwind, and system prefers-color-scheme.
+ */
+.reladraw-auto {
+  display: block;
+}
+
+.reladraw-auto .reladraw-dark {
+  display: none;
+}
+
+.reladraw-auto .reladraw-light {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  .reladraw-auto .reladraw-dark {
+    display: block;
+  }
+  .reladraw-auto .reladraw-light {
+    display: none;
+  }
+}
+
+:root[data-theme="dark"] .reladraw-auto .reladraw-dark,
+html[data-theme="dark"] .reladraw-auto .reladraw-dark,
+.dark .reladraw-auto .reladraw-dark,
+[data-theme="dark"] .reladraw-auto .reladraw-dark {
+  display: block !important;
+}
+
+:root[data-theme="dark"] .reladraw-auto .reladraw-light,
+html[data-theme="dark"] .reladraw-auto .reladraw-light,
+.dark .reladraw-auto .reladraw-light,
+[data-theme="dark"] .reladraw-auto .reladraw-light {
+  display: none !important;
+}
+
+:root[data-theme="light"] .reladraw-auto .reladraw-dark,
+html[data-theme="light"] .reladraw-auto .reladraw-dark,
+.light .reladraw-auto .reladraw-dark,
+[data-theme="light"] .reladraw-auto .reladraw-dark {
+  display: none !important;
+}
+
+:root[data-theme="light"] .reladraw-auto .reladraw-light,
+html[data-theme="light"] .reladraw-auto .reladraw-light,
+.light .reladraw-auto .reladraw-light,
+[data-theme="light"] .reladraw-auto .reladraw-light {
+  display: block !important;
+}
+
+.reladraw svg {
+  max-width: 100%;
+  height: auto;
+}

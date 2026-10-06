@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { markdownToHtml, mdxToJs } from "satteri";
 import {
+  AUTO_THEME_CSS,
   BUILTIN_THEME_NAMES,
   BUILTIN_THEMES,
   createAccent,
@@ -10,8 +11,13 @@ import {
   mixColors,
   oxocarbonDark,
   oxocarbonLight,
+  registerTheme,
+  registerThemes,
   satteriReladraw,
   satteriReladrawHast,
+  THEME_NAMES,
+  THEME_PAIRS,
+  THEMES,
 } from "./index.js";
 
 const basicDiagram = `
@@ -345,6 +351,9 @@ describe("theming utilities & exports", () => {
     expect(BUILTIN_THEMES["github-light"]).toBe(githubLight);
     expect(BUILTIN_THEMES["oxocarbon-dark"]).toBe(oxocarbonDark);
     expect(BUILTIN_THEMES["oxocarbon-light"]).toBe(oxocarbonLight);
+    expect(THEME_PAIRS.auto).toBeDefined();
+    expect(THEME_PAIRS.github).toEqual({ dark: "github-dark", light: "github-light" });
+    expect(THEME_PAIRS.oxocarbon).toEqual({ dark: "oxocarbon-dark", light: "oxocarbon-light" });
   });
 
   it("mixColors correctly blends two hex colors", () => {
@@ -388,5 +397,256 @@ describe("theming utilities & exports", () => {
     expect(custom.iconShade).toBeDefined();
     expect(custom.primary).toBeDefined();
     expect(custom.secondary).toBeDefined();
+  });
+
+  it("registerTheme registers a theme dynamically and returns it", () => {
+    const custom = registerTheme("test-dynamic-theme", {
+      background: "#010203",
+      boxFill: "#040506",
+      boxStroke: "#070809",
+      text: "#ffffff",
+      edge: "#112233",
+    });
+
+    expect(custom.background).toBe("#010203");
+    expect(THEME_NAMES).toContain("test-dynamic-theme");
+    expect(THEMES["test-dynamic-theme"]).toBeDefined();
+  });
+
+  it("registerThemes registers multiple themes at once", () => {
+    registerThemes({
+      "test-multi-1": {
+        background: "#111111",
+        boxFill: "#222222",
+        boxStroke: "#333333",
+        text: "#ffffff",
+        edge: "#444444",
+      },
+      "test-multi-2": {
+        background: "#aaaaaa",
+        boxFill: "#bbbbbb",
+        boxStroke: "#cccccc",
+        text: "#000000",
+        edge: "#dddddd",
+      },
+    });
+
+    expect(THEME_NAMES).toContain("test-multi-1");
+    expect(THEME_NAMES).toContain("test-multi-2");
+    expect(THEMES["test-multi-1"]).toBeDefined();
+    expect(THEMES["test-multi-2"]).toBeDefined();
+  });
+});
+
+describe("auto-theming (Astro / Starlight integration)", () => {
+  it("renders dual SVGs (dark and light) with reladraw-auto wrapper when theme='auto'", async () => {
+    const markdown = `\`\`\`reladraw\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw({ theme: "auto" })],
+    });
+
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    expect(result.html).toContain('class="reladraw-dark"');
+    expect(result.html).toContain('class="reladraw-light"');
+    expect(result.html).toContain("<style data-reladraw-styles>");
+    expect(result.html).toContain(AUTO_THEME_CSS);
+
+    // Dark SVG should have dark background (#111111)
+    expect(result.html).toContain('fill="#111111"');
+    // Light SVG should have light background (#ffffff)
+    expect(result.html).toContain('fill="#ffffff"');
+  });
+
+  it("injects responsive CSS style tag only once for multiple diagrams", async () => {
+    const markdown = `\`\`\`reladraw\nnode a\n\`\`\`\n\n\`\`\`reladraw\nnode b\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw({ theme: "auto" })],
+    });
+
+    // The style tag should only be injected once in the document
+    const styleCount = (result.html.match(/data-reladraw-styles/g) ?? []).length;
+    expect(styleCount).toBe(1);
+
+    // But both diagrams should have reladraw-auto class
+    const autoCount = (result.html.match(/class="reladraw reladraw-auto"/g) ?? []).length;
+    expect(autoCount).toBe(2);
+  });
+
+  it("does not inject style tag when injectStyles is false", async () => {
+    const markdown = `\`\`\`reladraw\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw({ theme: "auto", injectStyles: false })],
+    });
+
+    expect(result.html).not.toContain("<style data-reladraw-styles>");
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    expect(result.html).toContain('class="reladraw-dark"');
+    expect(result.html).toContain('class="reladraw-light"');
+  });
+
+  it("enables auto-theming via code fence auto attribute or theme='auto'", async () => {
+    const markdown = `\`\`\`reladraw auto\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw()],
+    });
+
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    expect(result.html).toContain('class="reladraw-dark"');
+    expect(result.html).toContain('class="reladraw-light"');
+  });
+
+  it("supports preset theme pair theme='github' (github-dark & github-light)", async () => {
+    const markdown = `\`\`\`reladraw theme=github\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw()],
+    });
+
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    // GitHub dark background is #0d1117
+    expect(result.html).toContain("#0d1117");
+    // GitHub light background is #ffffff and light border is #d0d7de
+    expect(result.html).toContain("#d0d7de");
+  });
+
+  it("supports preset theme pair theme='oxocarbon' (oxocarbon-dark & oxocarbon-light)", async () => {
+    const markdown = `\`\`\`reladraw theme=oxocarbon\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw()],
+    });
+
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    // Oxocarbon dark background is #161616
+    expect(result.html).toContain("#161616");
+    // Oxocarbon light background is #f2f4f8
+    expect(result.html).toContain("#f2f4f8");
+  });
+
+  it("supports slash/colon syntax for arbitrary theme pairs, e.g. theme='dracula:light'", async () => {
+    const markdown = `\`\`\`reladraw theme="dracula:light"\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw()],
+    });
+
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    // Dracula dark background is #282a36
+    expect(result.html).toContain("#282a36");
+    // Light background is #ffffff
+    expect(result.html).toContain("#ffffff");
+  });
+
+  it("supports explicit ThemePair in options.autoTheme", async () => {
+    const markdown = `\`\`\`reladraw\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [
+        satteriReladraw({
+          autoTheme: {
+            dark: "solarized-dark",
+            light: "solarized-light",
+          },
+        }),
+      ],
+    });
+
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    // Solarized dark background is #002b36
+    expect(result.html).toContain("#002b36");
+    // Solarized light background is #fdf6e3
+    expect(result.html).toContain("#fdf6e3");
+  });
+
+  it("in-diagram 'diagram theme: <name>' takes precedence over global auto-theming", async () => {
+    const sourceWithTheme = `diagram theme: vesper\n${basicDiagram}`;
+    const markdown = `\`\`\`reladraw\n${sourceWithTheme}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw({ theme: "auto" })],
+    });
+
+    // Should NOT be dual-themed because in-diagram theme pins it to vesper
+    expect(result.html).not.toContain("reladraw-auto");
+    expect(result.html).not.toContain("reladraw-dark");
+    // Vesper background is #101010
+    expect(result.html).toContain("#101010");
+  });
+
+  it("specific single theme on code fence meta overrides global auto-theming", async () => {
+    const markdown = `\`\`\`reladraw theme=github-light\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw({ theme: "auto" })],
+    });
+
+    // Should NOT be dual-themed
+    expect(result.html).not.toContain("reladraw-auto");
+    expect(result.html).toContain('fill="#ffffff"');
+    expect(result.html).toContain("#0969da");
+  });
+});
+
+describe("custom theming with in-diagram statements", () => {
+  it("allows in-diagram 'diagram theme: ...' when global theme is set", async () => {
+    const source = `diagram theme: nord\n${basicDiagram}`;
+    const markdown = `\`\`\`reladraw\n${source}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw({ theme: "dark" })],
+    });
+
+    // Nord background is #2e3440
+    expect(result.html).toContain("#2e3440");
+  });
+
+  it("allows in-diagram 'diagram theme: <custom>' registered in options.themes", async () => {
+    const source = `diagram theme: custom-in-diagram\n${basicDiagram}`;
+    const markdown = `\`\`\`reladraw\n${source}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [
+        satteriReladraw({
+          themes: {
+            "custom-in-diagram": {
+              background: "#314159",
+              boxFill: "#415169",
+              boxStroke: "#516179",
+              text: "#f0f0f0",
+              edge: "#88aaff",
+            },
+          },
+        }),
+      ],
+    });
+
+    expect(result.html).toContain("#314159");
+    expect(result.html).toContain("#88aaff");
+  });
+});
+
+describe("transparent background", () => {
+  it("sets background rect fill to none with options.transparent = true", async () => {
+    const markdown = `\`\`\`reladraw\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw({ transparent: true })],
+    });
+
+    expect(result.html).toContain('<rect x="0" y="0"');
+    expect(result.html).toContain('fill="none"');
+  });
+
+  it("sets background rect fill to none via code fence meta 'transparent'", async () => {
+    const markdown = `\`\`\`reladraw transparent\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw()],
+    });
+
+    expect(result.html).toContain('<rect x="0" y="0"');
+    expect(result.html).toContain('fill="none"');
+  });
+
+  it("works with auto-theming mode and transparent: true", async () => {
+    const markdown = `\`\`\`reladraw theme=auto transparent\n${basicDiagram}\n\`\`\``;
+    const result = await markdownToHtml(markdown, {
+      mdastPlugins: [satteriReladraw()],
+    });
+
+    expect(result.html).toContain('class="reladraw reladraw-auto"');
+    // Both SVGs should have transparent canvas rects
+    const noneMatches = (result.html.match(/fill="none"/g) ?? []).length;
+    expect(noneMatches).toBeGreaterThanOrEqual(2);
   });
 });

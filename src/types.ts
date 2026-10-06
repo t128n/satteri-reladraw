@@ -1,5 +1,5 @@
 import type { RenderOptions, ResolveOptions, Theme } from "reladraw";
-import type { ThemeDefinition } from "./themes.js";
+import type { ThemeDefinition, ThemePair } from "./themes.js";
 
 /**
  * Output rendering mode for reladraw diagrams.
@@ -15,6 +15,14 @@ export type ReladrawMode = "svg" | "element";
  * - 'throw': Rethrows the error, causing compilation to abort.
  */
 export type ReladrawOnError = "report" | "fallback" | "throw";
+
+/**
+ * Option type for auto-theming configuration.
+ * - `boolean`: `true` to enable auto-theming with default pair ('dark' and 'light').
+ * - `string`: A theme pair preset name (e.g. 'github', 'oxocarbon', 'catppuccin') or 'dark:light' pair.
+ * - `ThemePair`: An explicit `{ dark, light }` theme specification.
+ */
+export type AutoThemeOption = boolean | string | ThemePair;
 
 /**
  * Configuration options for the satteri-reladraw plugin.
@@ -34,10 +42,37 @@ export interface SatteriReladrawOptions {
   mode?: ReladrawMode;
 
   /**
-   * Default theme name or Theme object for diagrams.
-   * Can be overridden per-diagram via code fence meta (e.g. `theme="github-dark"`).
+   * Default theme name, Theme object, ThemeDefinition, 'auto', or ThemePair for diagrams.
+   * Can be overridden per-diagram via code fence meta (e.g. `theme="github-dark"` or `theme="github"`).
    */
-  theme?: string | Theme | ThemeDefinition;
+  theme?: string | Theme | ThemeDefinition | "auto" | ThemePair;
+
+  /**
+   * Auto-theming configuration. When enabled, dual SVGs (dark and light) are rendered,
+   * switching automatically based on `:root[data-theme='dark']` (Starlight),
+   * `.dark` (Tailwind), or `@media (prefers-color-scheme: dark)`.
+   *
+   * - `true`: Enables auto-theming using the default pair ('dark' and 'light') or the pair in `theme`.
+   * - `false`: Disables auto-theming.
+   * - Preset name: 'github', 'oxocarbon', 'catppuccin', 'solarized', 'gruvbox', 'high-contrast'.
+   * - Explicit pair: `{ dark: 'github-dark', light: 'github-light' }`.
+   */
+  autoTheme?: AutoThemeOption;
+
+  /**
+   * Whether to inject responsive auto-theming CSS into rendered output.
+   * If `false`, you can import `satteri-reladraw/theme.css` in your project or Starlight config.
+   * @default true
+   */
+  injectStyles?: boolean;
+
+  /**
+   * If `true`, sets the SVG canvas background to transparent (`none`) instead of
+   * the theme's background fill color.
+   * Can also be enabled per diagram via code fence meta (`transparent` or `transparent=true`).
+   * @default false
+   */
+  transparent?: boolean;
 
   /**
    * Custom themes dictionary mapping theme names to Theme objects or ThemeDefinitions.
@@ -90,6 +125,9 @@ export interface SatteriReladrawOptions {
  */
 export interface DiagramMeta {
   theme?: string;
+  autoTheme?: boolean | string;
+  auto?: boolean;
+  transparent?: boolean;
   mode?: ReladrawMode;
   className?: string;
   tag?: "div" | "figure" | null;
