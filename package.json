@@ -1,6 +1,6 @@
 {
   "name": "satteri-reladraw",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sätteri plugin for reladraw diagrams",
   "keywords": [
     "astro",
