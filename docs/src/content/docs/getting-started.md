@@ -26,18 +26,18 @@ Ensure `satteri` (>= 0.10.0) is installed in your project.
 
 Import the plugin and add it to `mdastPlugins` when compiling Markdown with Sätteri:
 
-```ts
+````ts
 import { markdownToHtml } from "satteri";
 import { satteriReladraw } from "satteri-reladraw";
 
 const markdown = `
 # My Document
 
-\`\`\`reladraw
+```reladraw
 node server "Application Server"
 node db "PostgreSQL" right of server level with server
 edge server -> db "query data"
-\`\`\`
+```
 `;
 
 const { html } = await markdownToHtml(markdown, {
@@ -45,7 +45,7 @@ const { html } = await markdownToHtml(markdown, {
 });
 
 console.log(html);
-```
+````
 
 ## Your First Diagram
 
