@@ -3,7 +3,7 @@ title: Astro Starlight Integration Guide
 description: Step-by-step guide for integrating satteri-reladraw into Astro Starlight using Sätteri.
 ---
 
-This guide walks you through integrating `satteri-reladraw` into an [Astro](https://astro.build) project using [Starlight](https://starlight.astro.build) and [Sätteri](https://satteri.dev).
+This guide walks you through integrating `satteri-reladraw` into an [Astro](https://astro.build) project using [Starlight](https://starlight.astro.build) and [Sätteri](https://satteri.bruits.org).
 
 ## Background: Astro & Sätteri
 
@@ -61,7 +61,13 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "My Documentation",
-      social: [{ icon: "github", label: "GitHub", href: "https://github.com/my-org/my-project" }],
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/my-org/my-project",
+        },
+      ],
       sidebar: [
         {
           label: "Guides",

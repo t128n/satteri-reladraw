@@ -3,7 +3,7 @@ title: Getting Started
 description: How to install and get started with satteri-reladraw in your project.
 ---
 
-`satteri-reladraw` integrates [reladraw](https://reladraw.dev) diagram generation into [Sätteri](https://satteri.dev) Markdown compilation.
+`satteri-reladraw` integrates [reladraw](https://reladraw.dev) diagram generation into [Sätteri](https://satteri.bruits.org) Markdown compilation.
 
 ## Installation
 

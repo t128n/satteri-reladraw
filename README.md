@@ -1,6 +1,6 @@
 # satteri-reladraw
 
-A [Sätteri](https://satteri.dev) plugin that compiles [reladraw](https://reladraw.dev) code fences into inline SVG or custom elements.
+A [Sätteri](https://satteri.bruits.org) plugin that compiles [reladraw](https://reladraw.dev) code fences into inline SVG or custom elements.
 
 reladraw is a declarative diagram syntax based on relative placement and explicit connections. `satteri-reladraw` integrates reladraw into Sätteri Markdown and MDX pipelines, rendering diagrams at build time without headless browsers or runtime dependencies.
 
@@ -198,7 +198,7 @@ bun run build
 ## Credits
 
 - [reladraw](https://reladraw.dev), declarative constraint-based diagramming engine.
-- [Sätteri](https://satteri.dev), content processing engine.
+- [Sätteri](https://satteri.bruits.org), content processing engine.
 - [GitHub Primer / github-vscode-theme](https://github.com/primer/github-vscode-theme), palette reference for GitHub Dark and Light themes.
 - [Oxocarbon (base16-oxocarbon)](https://github.com/nyoom-engineering/base16-oxocarbon), palette reference for Oxocarbon Dark and Light themes.
 
