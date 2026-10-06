@@ -2,7 +2,6 @@
 
 [![npm version](https://npmx.dev/api/registry/badge/version/satteri-reladraw)](https://npmx.dev/package/satteri-reladraw)
 [![CI](https://github.com/t128n/satteri-reladraw/actions/workflows/ci.yml/badge.svg)](https://github.com/t128n/satteri-reladraw/actions/workflows/ci.yml)
-[![TypeScript](https://npmx.dev/api/registry/badge/types/satteri-reladraw)](https://npmx.dev/package/satteri-reladraw)
 [![Install Size](https://npmx.dev/api/registry/badge/size/satteri-reladraw)](https://npmx.dev/package/satteri-reladraw)
 [![License](https://npmx.dev/api/registry/badge/license/satteri-reladraw)](https://github.com/t128n/satteri-reladraw/blob/main/LICENSE)
 
