@@ -24,11 +24,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js (for npm OIDC Trusted Publishing)
+      - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 22
-          registry-url: "https://registry.npmjs.org"
+          node-version: 24
+
+      - name: Upgrade npm (requires >=11.5.1 for OIDC Trusted Publishing)
+        run: |
+          npm install -g npm@latest
+          if [ -n "$NPM_CONFIG_USERCONFIG" ] && [ -f "$NPM_CONFIG_USERCONFIG" ]; then
+            sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG"
+          fi
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
