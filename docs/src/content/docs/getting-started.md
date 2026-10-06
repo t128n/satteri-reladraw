@@ -84,4 +84,4 @@ const { code } = await mdxToJs(markdown, {
 });
 ```
 
-Next, see the [Astro Starlight Integration](/astro-integration/) guide to integrate diagrams into documentation sites.
+Next, see the [Astro Starlight Integration](/satteri-reladraw/astro-integration/) guide to integrate diagrams into documentation sites.

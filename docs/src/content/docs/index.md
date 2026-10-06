@@ -6,11 +6,11 @@ hero:
   tagline: Declarative relative-placement diagrams in your Sätteri Markdown and Starlight docs.
   actions:
     - text: Getting Started
-      link: /getting-started/
+      link: /satteri-reladraw/getting-started/
       icon: right-arrow
       variant: primary
     - text: View Showcase
-      link: /showcase/
+      link: /satteri-reladraw/showcase/
       icon: rocket
       variant: secondary
     - text: GitHub Repository
@@ -19,22 +19,12 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+## Highlights
 
-<CardGrid stagger>
-  <Card title="Compile-Time SVG" icon="rocket">
-    Diagrams are transformed into standalone SVG graphics directly at compile time with zero browser dependencies.
-  </Card>
-  <Card title="Native Sätteri Plugin" icon="puzzle">
-    Built for Sätteri's ultra-fast Rust-backed pipeline, supporting both MDAST and HAST plugin architectures.
-  </Card>
-  <Card title="14 Built-In Themes" icon="pencil">
-    Out of the box support for Catppuccin, Dracula, Nord, Vesper, Gruvbox, Solarized, and more.
-  </Card>
-  <Card title="Clean Relative Syntax" icon="document">
-    Write diagrams where things go relative to each other — no manual coordinate math, no unpredictable auto-layout.
-  </Card>
-</CardGrid>
+- 🚀 **Compile-Time SVG**: Diagrams are transformed into standalone SVG graphics directly at compile time with zero browser dependencies.
+- 🧩 **Native Sätteri Plugin**: Built for Sätteri's ultra-fast Rust-backed pipeline, supporting both MDAST and HAST plugin architectures.
+- 🎨 **14 Built-In Themes**: Out of the box support for Catppuccin, Dracula, Nord, Vesper, Gruvbox, Solarized, and more.
+- 📐 **Clean Relative Syntax**: Write diagrams where things go relative to each other — no manual coordinate math, no unpredictable auto-layout.
 
 ## Live Example
 

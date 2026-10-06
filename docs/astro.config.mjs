@@ -5,7 +5,7 @@ import { satteriReladraw } from "satteri-reladraw";
 
 export default defineConfig({
   site: "https://t128n.github.io",
-  base: process.env.BASE_URL || undefined,
+  base: "/satteri-reladraw",
   markdown: {
     processor: satteri({
       mdastPlugins: [satteriReladraw({ theme: "dark" })],
