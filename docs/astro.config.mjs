@@ -21,6 +21,11 @@ export default defineConfig({
           label: "GitHub",
           href: "https://github.com/t128n/satteri-reladraw",
         },
+        {
+          icon: "npmx",
+          label: "npmx",
+          href: "https://npmx.dev/package/satteri-reladraw",
+        },
       ],
       sidebar: [
         {
