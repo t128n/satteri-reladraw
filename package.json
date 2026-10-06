@@ -4,17 +4,10 @@
   "description": "Sätteri plugin for reladraw diagrams",
   "keywords": [
     "astro",
-    "astro-plugin",
     "diagram",
-    "diagrams",
-    "markdown",
-    "mdx",
     "reladraw",
     "satteri",
-    "satteri-plugin",
-    "starlight",
-    "starlight-plugin",
-    "svg"
+    "starlight"
   ],
   "homepage": "https://github.com/t128n/satteri-reladraw#readme",
   "bugs": {
