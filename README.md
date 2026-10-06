@@ -32,26 +32,26 @@ pnpm add satteri-reladraw reladraw
 
 ### Basic Usage
 
-```ts
+````ts
 import { markdownToHtml } from "satteri";
 import { satteriReladraw } from "satteri-reladraw";
 
 const markdown = `
 # Architecture
 
-\`\`\`reladraw
+```reladraw
 node client "Client"
 node api "API Gateway" right of client
 node db "Database" right of api
 edge client -> api "HTTPS"
 edge api -> db "gRPC"
-\`\`\`
+```
 `;
 
 const { html } = await markdownToHtml(markdown, {
   mdastPlugins: [satteriReladraw({ theme: "auto" })],
 });
-```
+````
 
 ### Astro Starlight Integration
 
@@ -164,8 +164,8 @@ node a "Client Rendered"
 
 ### Built-in Themes
 
-- **GitHub**: `github-dark`, `github-light`
-- **Oxocarbon**: `oxocarbon-dark`, `oxocarbon-light`
+- **GitHub**: `github-dark`, `github-light` (adapted from [primer/github-vscode-theme](https://github.com/primer/github-vscode-theme))
+- **Oxocarbon**: `oxocarbon-dark`, `oxocarbon-light` (adapted from [nyoom-engineering/base16-oxocarbon](https://github.com/nyoom-engineering/base16-oxocarbon))
 - **Core reladraw**: `dark`, `light`, `solarized-dark`, `solarized-light`, `gruvbox-dark`, `gruvbox-light`, `catppuccin-mocha`, `catppuccin-latte`, `nord`, `dracula`, `vesper`, `high-contrast-dark`, `high-contrast-light`, `print`
 
 ### Built-in Auto Theme Pairs
@@ -194,6 +194,13 @@ bun run lint
 bun run format:check
 bun run build
 ```
+
+## Credits
+
+- [reladraw](https://reladraw.dev), declarative constraint-based diagramming engine.
+- [Sätteri](https://satteri.dev), content processing engine.
+- [GitHub Primer / github-vscode-theme](https://github.com/primer/github-vscode-theme), palette reference for GitHub Dark and Light themes.
+- [Oxocarbon (base16-oxocarbon)](https://github.com/nyoom-engineering/base16-oxocarbon), palette reference for Oxocarbon Dark and Light themes.
 
 ## License
 

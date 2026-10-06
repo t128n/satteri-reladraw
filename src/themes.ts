@@ -89,7 +89,8 @@ export function defineTheme(def: ThemeDefinition): Theme {
 }
 
 /**
- * GitHub Light theme based on GitHub Primer colors.
+ * GitHub Light theme based on GitHub Primer colors from primer/github-vscode-theme.
+ * @see https://github.com/primer/github-vscode-theme
  */
 export const githubLight: Theme = {
   background: "#ffffff",
@@ -107,7 +108,8 @@ export const githubLight: Theme = {
 };
 
 /**
- * GitHub Dark theme based on GitHub Primer colors.
+ * GitHub Dark theme based on GitHub Primer colors from primer/github-vscode-theme.
+ * @see https://github.com/primer/github-vscode-theme
  */
 export const githubDark: Theme = {
   background: "#0d1117",
@@ -127,6 +129,7 @@ export const githubDark: Theme = {
 /**
  * Oxocarbon Dark theme based on nyoom-engineering/base16-oxocarbon.
  * IBM Carbon-inspired dark aesthetic.
+ * @see https://github.com/nyoom-engineering/base16-oxocarbon
  */
 export const oxocarbonDark: Theme = {
   background: "#161616",
@@ -146,6 +149,7 @@ export const oxocarbonDark: Theme = {
 /**
  * Oxocarbon Light theme based on nyoom-engineering/base16-oxocarbon.
  * IBM Carbon-inspired light aesthetic.
+ * @see https://github.com/nyoom-engineering/base16-oxocarbon
  */
 export const oxocarbonLight: Theme = {
   background: "#f2f4f8",

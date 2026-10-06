@@ -101,15 +101,15 @@ edge stream -> clickhouse "stream sync"
 
 You can pass any of these pair presets via `theme="<name>"` or `autoTheme="<name>"`:
 
-| Preset Name     | Dark Variant         | Light Variant         | Description                    |
-| :-------------- | :------------------- | :-------------------- | :----------------------------- |
-| `auto`          | `dark`               | `light`               | Default reladraw pair          |
-| `github`        | `github-dark`        | `github-light`        | GitHub Primer color system     |
-| `oxocarbon`     | `oxocarbon-dark`     | `oxocarbon-light`     | IBM Carbon industrial palettes |
-| `catppuccin`    | `catppuccin-mocha`   | `catppuccin-latte`    | Soothing pastel palettes       |
-| `solarized`     | `solarized-dark`     | `solarized-light`     | Ethan Schoonover palettes      |
-| `gruvbox`       | `gruvbox-dark`       | `gruvbox-light`       | Retro groove warm palettes     |
-| `high-contrast` | `high-contrast-dark` | `high-contrast-light` | High accessibility contrast    |
+| Preset Name     | Dark Variant         | Light Variant         | Description                                                                                              |
+| :-------------- | :------------------- | :-------------------- | :------------------------------------------------------------------------------------------------------- |
+| `auto`          | `dark`               | `light`               | Default reladraw pair                                                                                    |
+| `github`        | `github-dark`        | `github-light`        | [GitHub Primer / github-vscode-theme](https://github.com/primer/github-vscode-theme)                     |
+| `oxocarbon`     | `oxocarbon-dark`     | `oxocarbon-light`     | [nyoom-engineering/base16-oxocarbon](https://github.com/nyoom-engineering/base16-oxocarbon) (IBM Carbon) |
+| `catppuccin`    | `catppuccin-mocha`   | `catppuccin-latte`    | Soothing pastel palettes                                                                                 |
+| `solarized`     | `solarized-dark`     | `solarized-light`     | Ethan Schoonover palettes                                                                                |
+| `gruvbox`       | `gruvbox-dark`       | `gruvbox-light`       | Retro groove warm palettes                                                                               |
+| `high-contrast` | `high-contrast-dark` | `high-contrast-light` | High accessibility contrast                                                                              |
 
 ### Custom Theme Pairs
 
@@ -345,23 +345,30 @@ const myTheme = registerTheme(
 
 ## Complete List of Built-In Themes
 
-| Theme Name            | Type  | Palette Origin          | Notes                        |
-| :-------------------- | :---- | :---------------------- | :--------------------------- |
-| `github-dark`         | Dark  | GitHub Primer           | Modern GitHub dark canvas    |
-| `github-light`        | Light | GitHub Primer           | Modern GitHub light canvas   |
-| `oxocarbon-dark`      | Dark  | Base16 Oxocarbon / IBM  | Industrial high-contrast     |
-| `oxocarbon-light`     | Light | Base16 Oxocarbon / IBM  | Crisp light canvas           |
-| `dark`                | Dark  | reladraw default        | Default fallback theme       |
-| `light`               | Light | reladraw core           | Clean white background       |
-| `catppuccin-mocha`    | Dark  | Catppuccin              | Soothing pastel dark         |
-| `catppuccin-latte`    | Light | Catppuccin              | Soothing pastel light        |
-| `nord`                | Dark  | Arctic Nord             | Arctic, north-bluish palette |
-| `dracula`             | Dark  | Dracula                 | Classic dark vampire palette |
-| `vesper`              | Dark  | Vesper (Rauno Freiberg) | Deep black & amber accents   |
-| `solarized-dark`      | Dark  | Ethan Schoonover        | Teal-slate precision palette |
-| `solarized-light`     | Light | Ethan Schoonover        | Cream precision palette      |
-| `gruvbox-dark`        | Dark  | Pavel Pertsev           | Retro groove warm dark       |
-| `gruvbox-light`       | Light | Pavel Pertsev           | Retro groove warm light      |
-| `high-contrast-dark`  | Dark  | Accessibility           | Maximum readability dark     |
-| `high-contrast-light` | Light | Accessibility           | Maximum readability light    |
-| `print`               | Light | Print-friendly          | Monochrome ink saver         |
+| Theme Name            | Type  | Palette Origin                                                                              | Notes                        |
+| :-------------------- | :---- | :------------------------------------------------------------------------------------------ | :--------------------------- |
+| `github-dark`         | Dark  | [GitHub Primer / github-vscode-theme](https://github.com/primer/github-vscode-theme)        | Modern GitHub dark canvas    |
+| `github-light`        | Light | [GitHub Primer / github-vscode-theme](https://github.com/primer/github-vscode-theme)        | Modern GitHub light canvas   |
+| `oxocarbon-dark`      | Dark  | [nyoom-engineering/base16-oxocarbon](https://github.com/nyoom-engineering/base16-oxocarbon) | Industrial high-contrast     |
+| `oxocarbon-light`     | Light | [nyoom-engineering/base16-oxocarbon](https://github.com/nyoom-engineering/base16-oxocarbon) | Crisp light canvas           |
+| `dark`                | Dark  | reladraw default                                                                            | Default fallback theme       |
+| `light`               | Light | reladraw core                                                                               | Clean white background       |
+| `catppuccin-mocha`    | Dark  | Catppuccin                                                                                  | Soothing pastel dark         |
+| `catppuccin-latte`    | Light | Catppuccin                                                                                  | Soothing pastel light        |
+| `nord`                | Dark  | Arctic Nord                                                                                 | Arctic, north-bluish palette |
+| `dracula`             | Dark  | Dracula                                                                                     | Classic dark vampire palette |
+| `vesper`              | Dark  | Vesper (Rauno Freiberg)                                                                     | Deep black & amber accents   |
+| `solarized-dark`      | Dark  | Ethan Schoonover                                                                            | Teal-slate precision palette |
+| `solarized-light`     | Light | Ethan Schoonover                                                                            | Cream precision palette      |
+| `gruvbox-dark`        | Dark  | Pavel Pertsev                                                                               | Retro groove warm dark       |
+| `gruvbox-light`       | Light | Pavel Pertsev                                                                               | Retro groove warm light      |
+| `high-contrast-dark`  | Dark  | Accessibility                                                                               | Maximum readability dark     |
+| `high-contrast-light` | Light | Accessibility                                                                               | Maximum readability light    |
+| `print`               | Light | Print-friendly                                                                              | Monochrome ink saver         |
+
+---
+
+## Credits & Palette Attribution
+
+- **GitHub Dark & Light**: Colors adapted from the [GitHub Primer](https://primer.style) design system and [primer/github-vscode-theme](https://github.com/primer/github-vscode-theme).
+- **Oxocarbon Dark & Light**: Colors adapted from the Base16 Oxocarbon theme by [nyoom-engineering/base16-oxocarbon](https://github.com/nyoom-engineering/base16-oxocarbon), inspired by the IBM Carbon design system.
