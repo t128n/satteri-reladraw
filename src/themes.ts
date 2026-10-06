@@ -1,4 +1,5 @@
 import { THEMES, THEME_NAMES, type Theme } from "reladraw";
+import rawAutoThemeCss from "./theme.css" with { type: "text" };
 
 export type Accent = Theme["primary"];
 
@@ -179,9 +180,19 @@ export const DEFAULT_ADDITIONAL_THEMES: Readonly<Record<string, Theme>> = {
 const mutableThemes = THEMES as Record<string, Theme>;
 const mutableThemeNames = THEME_NAMES as string[];
 
+/**
+ * Names satteri-reladraw itself has registered into reladraw's global theme
+ * dictionaries (its own defaults, plus anything registered via `registerTheme`/
+ * `registerThemes`). Distinguishes "we're updating our own theme" from
+ * "this would silently clobber a theme reladraw or another consumer already
+ * defined under this name".
+ */
+const ownedThemeNames = new Set<string>();
+
 // Auto-register default additional themes into reladraw's runtime dictionaries
 for (const [name, theme] of Object.entries(DEFAULT_ADDITIONAL_THEMES)) {
   mutableThemes[name] = theme;
+  ownedThemeNames.add(name);
   if (!mutableThemeNames.includes(name)) {
     mutableThemeNames.push(name);
   }
@@ -223,20 +234,48 @@ export const THEME_PAIRS: Readonly<Record<string, ThemePair>> = {
 };
 
 /**
+ * Minifies CSS by stripping comments and collapsing whitespace around punctuation.
+ * Not a general-purpose minifier — just enough to compact `theme.css` for inline injection.
+ */
+function minifyCss(css: string): string {
+  return css
+    .replace(/\/\*[^]*?\*\//g, "")
+    .replace(/\s*([{}:;,])\s*/g, "$1")
+    .replace(/;}/g, "}")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
  * Responsive CSS for auto-theming diagrams.
  * Supports Starlight (`[data-theme='dark']` / `[data-theme='light']`),
  * Tailwind (`.dark` / `.light`), and system `@media (prefers-color-scheme: dark)`.
+ *
+ * Derived from `theme.css` (the human-readable, importable copy) at module load
+ * so the two can never drift out of sync.
  */
-export const AUTO_THEME_CSS =
-  '.reladraw-auto{display:block}.reladraw-auto .reladraw-dark{display:none}.reladraw-auto .reladraw-light{display:block}@media (prefers-color-scheme:dark){.reladraw-auto .reladraw-dark{display:block}.reladraw-auto .reladraw-light{display:none}}:root[data-theme="dark"] .reladraw-auto .reladraw-dark,html[data-theme="dark"] .reladraw-auto .reladraw-dark,.dark .reladraw-auto .reladraw-dark,[data-theme="dark"] .reladraw-auto .reladraw-dark{display:block!important}:root[data-theme="dark"] .reladraw-auto .reladraw-light,html[data-theme="dark"] .reladraw-auto .reladraw-light,.dark .reladraw-auto .reladraw-light,[data-theme="dark"] .reladraw-auto .reladraw-light{display:none!important}:root[data-theme="light"] .reladraw-auto .reladraw-dark,html[data-theme="light"] .reladraw-auto .reladraw-dark,.light .reladraw-auto .reladraw-dark,[data-theme="light"] .reladraw-auto .reladraw-dark{display:none!important}:root[data-theme="light"] .reladraw-auto .reladraw-light,html[data-theme="light"] .reladraw-auto .reladraw-light,.light .reladraw-auto .reladraw-light,[data-theme="light"] .reladraw-auto .reladraw-light{display:block!important}.reladraw svg{max-width:100%;height:auto}';
+export const AUTO_THEME_CSS = minifyCss(rawAutoThemeCss);
 
-/**
- * Registers a custom theme into reladraw's runtime dictionaries so that
- * in-diagram `diagram theme: <name>` statements and code fence `theme="<name>"` resolve it.
- */
-export function registerTheme(name: string, theme: Theme | ThemeDefinition): Theme {
+function registerThemeInternal(
+  name: string,
+  theme: Theme | ThemeDefinition,
+  allowOverride: boolean,
+): Theme {
+  const existedBefore = name in mutableThemes;
+  if (!allowOverride && existedBefore && !ownedThemeNames.has(name)) {
+    throw new Error(
+      `Theme name "${name}" collides with a built-in reladraw theme. Choose a different name.`,
+    );
+  }
+
   const resolved = defineTheme(theme);
   mutableThemes[name] = resolved;
+  // Only claim ownership of a genuinely new name, or one we already owned. An
+  // override of a name we don't own (e.g. via `registerThemeOverrides`) must not
+  // grant future unrelated `registerTheme` calls a pass on the collision guard above.
+  if (!existedBefore || ownedThemeNames.has(name)) {
+    ownedThemeNames.add(name);
+  }
   if (!mutableThemeNames.includes(name)) {
     mutableThemeNames.push(name);
   }
@@ -244,10 +283,37 @@ export function registerTheme(name: string, theme: Theme | ThemeDefinition): The
 }
 
 /**
+ * Registers a custom theme into reladraw's runtime dictionaries so that
+ * in-diagram `diagram theme: <name>` statements and code fence `theme="<name>"` resolve it.
+ *
+ * Throws if `name` would silently overwrite a theme satteri-reladraw didn't itself
+ * register — e.g. one of reladraw's own built-ins (`"dark"`, `"catppuccin-mocha"`, etc.) —
+ * since that would affect every other diagram sharing this process, not just the caller's own.
+ * Re-registering a name this function (or a default theme) already registered is allowed.
+ * To deliberately override a built-in theme, use the plugin's `themes` option instead.
+ */
+export function registerTheme(name: string, theme: Theme | ThemeDefinition): Theme {
+  return registerThemeInternal(name, theme, false);
+}
+
+/**
  * Registers multiple custom themes into reladraw's runtime dictionaries.
+ * See {@link registerTheme} for the built-in name collision guard.
  */
 export function registerThemes(themes: Record<string, Theme | ThemeDefinition>): void {
   for (const [name, theme] of Object.entries(themes)) {
     registerTheme(name, theme);
+  }
+}
+
+/**
+ * Registers themes supplied via the plugin's `themes` option, which is documented
+ * to allow deliberately overriding built-in theme names — unlike the public
+ * {@link registerTheme}/{@link registerThemes}, this never throws on collision.
+ * Not part of the public API; used internally by `satteriReladraw`/`satteriReladrawHast`.
+ */
+export function registerThemeOverrides(themes: Record<string, Theme | ThemeDefinition>): void {
+  for (const [name, theme] of Object.entries(themes)) {
+    registerThemeInternal(name, theme, true);
   }
 }

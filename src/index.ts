@@ -5,7 +5,8 @@ import {
   type HastPluginDefinition,
   type MdastPluginDefinition,
 } from "satteri";
-import type { DiagramMeta, SatteriReladrawOptions } from "./types.js";
+import { registerThemeOverrides } from "./themes.js";
+import type { DiagramMeta, ReladrawOnError, SatteriReladrawOptions } from "./types.js";
 import { parseMeta, renderDefaultError, renderReladraw } from "./utils.js";
 
 export type {
@@ -72,6 +73,53 @@ declare module "satteri" {
   }
 }
 
+type RenderErrorOutcome =
+  | { action: "throw"; error: Error }
+  | { action: "skip" }
+  | { action: "html"; html: string };
+
+/**
+ * Shared error-handling logic for both the MDAST and HAST plugins: normalizes
+ * the thrown error, reports/records a diagnostic, and decides what the caller
+ * should do next based on `onError`. Reporting and diagnostics are taken as
+ * callbacks since `ctx.report`'s `node` parameter type differs between the
+ * MDAST and HAST contexts.
+ */
+function handleRenderError(
+  err: unknown,
+  code: string,
+  options: SatteriReladrawOptions,
+  onError: ReladrawOnError,
+  report: (message: string, severity: "error" | "warning") => void,
+  pushDiagnostic: (diagnostic: ReladrawDiagnostic) => void,
+): RenderErrorOutcome {
+  const error = err instanceof Error ? err : new Error(String(err));
+  const line =
+    error && typeof error === "object" && "line" in error
+      ? (error as { line: number }).line
+      : undefined;
+  const lineSuffix = line != null ? ` (line ${line})` : "";
+  const message = `Failed to compile reladraw diagram${lineSuffix}: ${error.message}`;
+  const severity = onError === "fallback" ? "warning" : "error";
+
+  report(message, severity);
+  pushDiagnostic({ message, severity, line });
+
+  if (onError === "throw") {
+    return { action: "throw", error };
+  }
+
+  if (onError === "fallback") {
+    return { action: "skip" };
+  }
+
+  // Default: 'report'
+  const html = options.renderError
+    ? options.renderError(error, code)
+    : renderDefaultError(error, code, options.className);
+  return { action: "html", html };
+}
+
 /**
  * Sätteri MDAST plugin for reladraw diagrams.
  *
@@ -91,6 +139,10 @@ declare module "satteri" {
 export function satteriReladraw(options: SatteriReladrawOptions = {}): MdastPluginDefinition {
   const languages = (options.languages ?? ["reladraw"]).map((l) => l.toLowerCase());
   const onError = options.onError ?? "report";
+
+  if (options.themes) {
+    registerThemeOverrides(options.themes);
+  }
 
   return defineMdastPlugin({
     name: "satteri-reladraw",
@@ -115,38 +167,25 @@ export function satteriReladraw(options: SatteriReladrawOptions = {}): MdastPlug
 
         return { raw: output, mdxExpressions: false };
       } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        const line =
-          error && typeof error === "object" && "line" in error
-            ? (error as { line: number }).line
-            : undefined;
-        const lineSuffix = line != null ? ` (line ${line})` : "";
-        const message = `Failed to compile reladraw diagram${lineSuffix}: ${error.message}`;
+        const outcome = handleRenderError(
+          err,
+          node.value,
+          options,
+          onError,
+          (message, severity) => ctx.report({ message, node, severity }),
+          (diagnostic) => {
+            const diagnostics = (ctx.data.reladrawDiagnostics ??= []);
+            diagnostics.push(diagnostic);
+          },
+        );
 
-        const severity = onError === "fallback" ? "warning" : "error";
-        ctx.report({
-          message,
-          node,
-          severity,
-        });
-
-        const diagnostics = (ctx.data.reladrawDiagnostics ??= []);
-        diagnostics.push({ message, severity, line });
-
-        if (onError === "throw") {
-          throw error;
+        if (outcome.action === "throw") {
+          throw outcome.error;
         }
-
-        if (onError === "fallback") {
+        if (outcome.action === "skip") {
           return;
         }
-
-        // Default: 'report'
-        const errorHtml = options.renderError
-          ? options.renderError(error, node.value)
-          : renderDefaultError(error, node.value, options.className);
-
-        return { raw: errorHtml, mdxExpressions: false };
+        return { raw: outcome.html, mdxExpressions: false };
       }
     },
   });
@@ -160,6 +199,10 @@ export function satteriReladraw(options: SatteriReladrawOptions = {}): MdastPlug
 export function satteriReladrawHast(options: SatteriReladrawOptions = {}): HastPluginDefinition {
   const languages = (options.languages ?? ["reladraw"]).map((l) => l.toLowerCase());
   const onError = options.onError ?? "report";
+
+  if (options.themes) {
+    registerThemeOverrides(options.themes);
+  }
 
   return defineHastPlugin({
     name: "satteri-reladraw-hast",
@@ -206,39 +249,27 @@ export function satteriReladrawHast(options: SatteriReladrawOptions = {}): HastP
             value: output,
           } as HastNode);
         } catch (err) {
-          const error = err instanceof Error ? err : new Error(String(err));
-          const line =
-            error && typeof error === "object" && "line" in error
-              ? (error as { line: number }).line
-              : undefined;
-          const lineSuffix = line != null ? ` (line ${line})` : "";
-          const message = `Failed to compile reladraw diagram${lineSuffix}: ${error.message}`;
+          const outcome = handleRenderError(
+            err,
+            codeText,
+            options,
+            onError,
+            (message, severity) => ctx.report({ message, node, severity }),
+            (diagnostic) => {
+              const diagnostics = (ctx.data.reladrawDiagnostics ??= []);
+              diagnostics.push(diagnostic);
+            },
+          );
 
-          const severity = onError === "fallback" ? "warning" : "error";
-          ctx.report({
-            message,
-            node,
-            severity,
-          });
-
-          const diagnostics = (ctx.data.reladrawDiagnostics ??= []);
-          diagnostics.push({ message, severity, line });
-
-          if (onError === "throw") {
-            throw error;
+          if (outcome.action === "throw") {
+            throw outcome.error;
           }
-
-          if (onError === "fallback") {
+          if (outcome.action === "skip") {
             return;
           }
-
-          const errorHtml = options.renderError
-            ? options.renderError(error, codeText)
-            : renderDefaultError(error, codeText, options.className);
-
           ctx.replaceNode(node, {
             type: "raw",
-            value: errorHtml,
+            value: outcome.html,
           } as HastNode);
         }
       },

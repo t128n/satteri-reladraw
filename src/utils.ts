@@ -1,10 +1,9 @@
-import { compile, type Theme } from "reladraw";
+import { compile, parse, render, resolve, type Theme } from "reladraw";
 import {
   AUTO_THEME_CSS,
   BUILTIN_THEMES,
   BUILTIN_THEME_NAMES,
   defineTheme,
-  registerThemes,
   THEME_PAIRS,
   type ThemeDefinition,
   type ThemePair,
@@ -256,105 +255,108 @@ export function applyTransparency(svg: string): string {
 }
 
 /**
- * Renders reladraw code to either an SVG string, dual auto-themed SVGs, or a `<reladraw-diagram>` element.
+ * Renders a `<reladraw-diagram>` custom element for client-side rendering (`mode: "element"`).
  */
-export function renderReladraw(
+function renderElementMode(
   code: string,
   meta: DiagramMeta,
-  options: SatteriReladrawOptions = {},
+  options: SatteriReladrawOptions,
 ): string {
-  if (options.themes) {
-    registerThemes(options.themes);
+  const rawTheme = meta.theme ?? (typeof options.theme === "string" ? options.theme : undefined);
+  const themeAttr = rawTheme ? ` theme="${escapeHtml(rawTheme)}"` : "";
+  return `<reladraw-diagram${themeAttr}>${escapeHtml(code)}</reladraw-diagram>`;
+}
+
+/**
+ * Renders a diagram as a dual dark/light SVG pair, parsing and laying out the
+ * diagram once and reusing that layout for both themed renders.
+ */
+function renderAutoThemeSvg(
+  code: string,
+  meta: DiagramMeta,
+  options: SatteriReladrawOptions,
+  isTransparent: boolean,
+): string {
+  const { dark, light } = resolveThemePair(meta, options);
+  const darkTheme = isTransparent ? makeThemeTransparent(dark) : dark;
+  const lightTheme = isTransparent ? makeThemeTransparent(light) : light;
+
+  const doc = parse(code);
+  const layout = resolve(doc, options.resolveOptions);
+
+  let darkSvg = render(layout, { ...options.renderOptions, theme: darkTheme });
+  let lightSvg = render(layout, { ...options.renderOptions, theme: lightTheme });
+
+  if (isTransparent) {
+    darkSvg = applyTransparency(darkSvg);
+    lightSvg = applyTransparency(lightSvg);
   }
 
-  const mode = meta.mode ?? options.mode ?? "svg";
-  const tag = meta.tag !== undefined ? meta.tag : options.tag !== undefined ? options.tag : "div";
-  const isTransparent = Boolean(meta.transparent ?? options.transparent);
+  return `<div class="reladraw-dark">${darkSvg}</div><div class="reladraw-light">${lightSvg}</div>`;
+}
 
-  const defaultClass = options.className !== undefined ? options.className : "reladraw";
-  const classNames: string[] = [];
-  if (defaultClass) {
-    classNames.push(defaultClass);
-  }
-  if (meta.className) {
-    classNames.push(meta.className);
-  }
+/**
+ * Renders a diagram as a single themed SVG (the non-auto-theme `mode: "svg"` path).
+ */
+function renderSingleThemeSvg(
+  code: string,
+  meta: DiagramMeta,
+  options: SatteriReladrawOptions,
+  isTransparent: boolean,
+): string {
+  const inDiagramTheme = hasDiagramTheme(code);
+  const rawTheme = meta.theme ?? options.theme;
+  const compileOptions: Record<string, unknown> = {
+    ...options.resolveOptions,
+    ...options.renderOptions,
+  };
 
-  let innerContent: string;
-  let auto = false;
-
-  if (mode === "element") {
-    const rawTheme = meta.theme ?? (typeof options.theme === "string" ? options.theme : undefined);
-    const themeAttr = rawTheme ? ` theme="${escapeHtml(rawTheme)}"` : "";
-    const escapedCode = escapeHtml(code);
-    innerContent = `<reladraw-diagram${themeAttr}>${escapedCode}</reladraw-diagram>`;
-  } else {
-    // Mode: svg
-    const inDiagramTheme = hasDiagramTheme(code);
-    auto = isAutoTheme(meta, options, code);
-
-    if (auto) {
-      classNames.push("reladraw-auto");
-      const { dark, light } = resolveThemePair(meta, options);
-      const darkTheme = isTransparent ? makeThemeTransparent(dark) : dark;
-      const lightTheme = isTransparent ? makeThemeTransparent(light) : light;
-
-      const compileOpts: Record<string, unknown> = {
-        ...options.resolveOptions,
-        ...options.renderOptions,
-      };
-
-      let darkSvg = compile(code, { ...compileOpts, theme: darkTheme });
-      let lightSvg = compile(code, { ...compileOpts, theme: lightTheme });
-
+  // Only pass theme if explicitly specified on fence, or if not specified in diagram
+  if (meta.theme || !inDiagramTheme) {
+    if (rawTheme && rawTheme !== "auto") {
+      let resolved = resolveTheme(
+        typeof rawTheme === "object" && "dark" in rawTheme
+          ? rawTheme.dark
+          : (rawTheme as string | Theme | ThemeDefinition),
+        options.themes,
+      );
+      if (!resolved) {
+        const available = [
+          ...(options.themes ? Object.keys(options.themes) : []),
+          ...BUILTIN_THEME_NAMES,
+        ];
+        throw new Error(
+          `Unknown reladraw theme "${String(rawTheme)}". Available themes: ${available.join(", ")}`,
+        );
+      }
       if (isTransparent) {
-        darkSvg = applyTransparency(darkSvg);
-        lightSvg = applyTransparency(lightSvg);
+        resolved = makeThemeTransparent(resolved);
       }
-
-      innerContent = `<div class="reladraw-dark">${darkSvg}</div><div class="reladraw-light">${lightSvg}</div>`;
-    } else {
-      const rawTheme = meta.theme ?? options.theme;
-      const compileOptions: Record<string, unknown> = {
-        ...options.resolveOptions,
-        ...options.renderOptions,
-      };
-
-      // Only pass theme if explicitly specified on fence, or if not specified in diagram
-      if (meta.theme || !inDiagramTheme) {
-        if (rawTheme && rawTheme !== "auto") {
-          let resolved = resolveTheme(
-            typeof rawTheme === "object" && "dark" in rawTheme
-              ? rawTheme.dark
-              : (rawTheme as string | Theme | ThemeDefinition),
-            options.themes,
-          );
-          if (!resolved) {
-            const available = [
-              ...(options.themes ? Object.keys(options.themes) : []),
-              ...BUILTIN_THEME_NAMES,
-            ];
-            throw new Error(
-              `Unknown reladraw theme "${String(rawTheme)}". Available themes: ${available.join(", ")}`,
-            );
-          }
-          if (isTransparent) {
-            resolved = makeThemeTransparent(resolved);
-          }
-          compileOptions.theme = resolved;
-        } else if (isTransparent) {
-          compileOptions.theme = makeThemeTransparent(BUILTIN_THEMES["dark"]!);
-        }
-      }
-
-      let svg = compile(code, compileOptions);
-      if (isTransparent) {
-        svg = applyTransparency(svg);
-      }
-      innerContent = svg;
+      compileOptions.theme = resolved;
+    } else if (isTransparent) {
+      compileOptions.theme = makeThemeTransparent(BUILTIN_THEMES["dark"]!);
     }
   }
 
+  let svg = compile(code, compileOptions);
+  if (isTransparent) {
+    svg = applyTransparency(svg);
+  }
+  return svg;
+}
+
+/**
+ * Wraps rendered diagram content in the configured tag/class/caption, injecting
+ * the auto-theme CSS once per document when needed.
+ */
+function wrapHtml(
+  innerContent: string,
+  meta: DiagramMeta,
+  options: SatteriReladrawOptions,
+  classNames: string[],
+  tag: "div" | "figure" | null,
+  auto: boolean,
+): string {
   let resultHtml = "";
   if (options.injectStyles && auto) {
     resultHtml += `<style data-reladraw-styles>${AUTO_THEME_CSS}</style>`;
@@ -372,4 +374,41 @@ export function renderReladraw(
 
   resultHtml += `<${tag}${classAttr}>${innerContent}${figcaption}</${tag}>`;
   return resultHtml;
+}
+
+/**
+ * Renders reladraw code to either an SVG string, dual auto-themed SVGs, or a `<reladraw-diagram>` element.
+ */
+export function renderReladraw(
+  code: string,
+  meta: DiagramMeta,
+  options: SatteriReladrawOptions = {},
+): string {
+  const mode = meta.mode ?? options.mode ?? "svg";
+  const tag = meta.tag !== undefined ? meta.tag : options.tag !== undefined ? options.tag : "div";
+  const isTransparent = Boolean(meta.transparent ?? options.transparent);
+
+  const defaultClass = options.className !== undefined ? options.className : "reladraw";
+  const classNames: string[] = [];
+  if (defaultClass) {
+    classNames.push(defaultClass);
+  }
+  if (meta.className) {
+    classNames.push(meta.className);
+  }
+
+  if (mode === "element") {
+    return wrapHtml(renderElementMode(code, meta, options), meta, options, classNames, tag, false);
+  }
+
+  const auto = isAutoTheme(meta, options, code);
+  if (auto) {
+    classNames.push("reladraw-auto");
+  }
+
+  const innerContent = auto
+    ? renderAutoThemeSvg(code, meta, options, isTransparent)
+    : renderSingleThemeSvg(code, meta, options, isTransparent);
+
+  return wrapHtml(innerContent, meta, options, classNames, tag, auto);
 }

@@ -413,6 +413,30 @@ describe("theming utilities & exports", () => {
     expect(THEMES["test-dynamic-theme"]).toBeDefined();
   });
 
+  it("registerTheme allows re-registering its own previously registered theme", () => {
+    expect(() =>
+      registerTheme("test-dynamic-theme", {
+        background: "#030201",
+        boxFill: "#060504",
+        boxStroke: "#090807",
+        text: "#ffffff",
+        edge: "#332211",
+      }),
+    ).not.toThrow();
+  });
+
+  it("registerTheme throws when the name collides with a built-in reladraw theme", () => {
+    expect(() =>
+      registerTheme("dark", {
+        background: "#000000",
+        boxFill: "#111111",
+        boxStroke: "#222222",
+        text: "#ffffff",
+        edge: "#333333",
+      }),
+    ).toThrow(/collides with a built-in reladraw theme/);
+  });
+
   it("registerThemes registers multiple themes at once", () => {
     registerThemes({
       "test-multi-1": {
