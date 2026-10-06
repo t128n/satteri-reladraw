@@ -1,5 +1,11 @@
 # satteri-reladraw
 
+[![npm version](https://npmx.dev/api/registry/badge/version/satteri-reladraw)](https://npmx.dev/package/satteri-reladraw)
+[![CI](https://github.com/t128n/satteri-reladraw/actions/workflows/ci.yml/badge.svg)](https://github.com/t128n/satteri-reladraw/actions/workflows/ci.yml)
+[![TypeScript](https://npmx.dev/api/registry/badge/types/satteri-reladraw)](https://npmx.dev/package/satteri-reladraw)
+[![Install Size](https://npmx.dev/api/registry/badge/size/satteri-reladraw)](https://npmx.dev/package/satteri-reladraw)
+[![License](https://npmx.dev/api/registry/badge/license/satteri-reladraw)](https://github.com/t128n/satteri-reladraw/blob/main/LICENSE)
+
 A [Sätteri](https://satteri.bruits.org) plugin that compiles [reladraw](https://reladraw.dev) code fences into inline SVG or custom elements.
 
 reladraw is a declarative diagram syntax based on relative placement and explicit connections. `satteri-reladraw` integrates reladraw into Sätteri Markdown and MDX pipelines, rendering diagrams at build time without headless browsers or runtime dependencies.

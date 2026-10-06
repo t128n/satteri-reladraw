@@ -1,0 +1,57 @@
+name: Dependabot Automation
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot:
+    name: Sync Lockfiles & Auto-Merge
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Sync root lockfile
+        run: bun install
+
+      - name: Sync docs lockfile
+        working-directory: docs
+        run: bun install
+
+      - name: Commit updated lockfiles if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add bun.lock docs/bun.lock
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(deps): update bun lockfile [skip ci]"
+            git push
+          fi
+
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Auto-approve and enable auto-merge for safe updates
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major' || steps.metadata.outputs.dependency-type == 'direct:development'
+        run: |
+          gh pr review --approve "$PR_URL" || true
+          gh pr merge --auto --squash "$PR_URL" || true
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
