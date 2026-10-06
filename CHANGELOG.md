@@ -1,5 +1,16 @@
 # satteri-reladraw
 
+## 0.1.1
+
+### Patch Changes
+
+- ffd35c7: Merged the duplicated MDAST/HAST error-handling code in `satteriReladraw`/`satteriReladrawHast` into one helper.
+- ffd35c7: `registerTheme`/`registerThemes` throw if a name collides with an existing built-in reladraw theme they didn't register themselves. The `options.themes` override path is unaffected.
+- ffd35c7: `options.themes` is registered once per plugin instance instead of once per diagram.
+- ffd35c7: `AUTO_THEME_CSS` is derived from `theme.css` at build time instead of being hand-maintained as a separate minified copy.
+- ffd35c7: Auto-themed diagrams now parse and resolve once and render twice (dark/light), instead of calling `compile()` twice.
+- ffd35c7: Split `renderReladraw` into smaller functions.
+
 ## 0.1.0
 
 ### Minor Changes
