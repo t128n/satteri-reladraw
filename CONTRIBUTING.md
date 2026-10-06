@@ -13,11 +13,20 @@ Please review these policies before contributing:
 
 This project uses [Bun](https://bun.com) as the package manager and test runner, along with [TypeScript](https://www.typescriptlang.org/), [oxlint](https://oxc.rs/), [oxfmt](https://oxc.rs/), and [hk](https://hk.jdx.dev/) for Git hooks.
 
+### Environment & Tooling with mise
+
+This repository includes a [`mise.toml`](mise.toml) configuration. If you use [mise-en-place](https://mise.jdx.dev/), you can automatically install and activate the required development toolchains (`bun`, `node`, `hk`):
+
+```bash
+mise install
+```
+
 ### Prerequisites
 
 - [Bun](https://bun.com) v1.2+
+- [Node.js](https://nodejs.org) v22+
 - [Git](https://git-scm.com)
-- Optional: [hk](https://hk.jdx.dev) CLI for local Git hook execution
+- [hk](https://hk.jdx.dev) CLI for local Git hook execution (managed automatically by `mise`)
 
 ### Initial Setup
 
