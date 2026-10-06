@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📚 Documentation
+    url: https://t128n.github.io/satteri-reladraw/
+    about: Read the official documentation and theme showcase
+  - name: 📦 npmx Package Explorer
+    url: https://npmx.dev/package/satteri-reladraw
+    about: Inspect package metadata, versions, bundle size, and dependencies

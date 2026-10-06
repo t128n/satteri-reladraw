@@ -1,0 +1,46 @@
+name: "🚀 Feature request"
+description: Suggest a feature or improvement for satteri-reladraw
+type: feature
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to suggest an improvement! Please check existing [issues](https://github.com/t128n/satteri-reladraw/issues) before opening a new request.
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Describe the feature
+      description: A clear and concise description of what you think would be a helpful addition to satteri-reladraw, including potential use cases and alternatives considered.
+      placeholder: Feature description
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-api
+    attributes:
+      label: Proposed syntax or API (optional)
+      description: If you have an idea of how the Markdown fence syntax or plugin configuration should look, share an example.
+      placeholder: |
+        ```reladraw theme=my-theme
+        ...
+        ```
+      render: markdown
+    validations:
+      required: false
+  - type: checkboxes
+    id: additional-info
+    attributes:
+      label: Additional information
+      description: Additional information that helps us decide how to proceed.
+      options:
+        - label: Would you be willing to help implement this feature?
+  - type: checkboxes
+    id: required-info
+    attributes:
+      label: Final checks
+      description: "Before submitting, please verify the following:"
+      options:
+        - label: I checked existing [issues](https://github.com/t128n/satteri-reladraw/issues) for similar suggestions.
+          required: true
+        - label: I reviewed the [AI Contribution Policy](https://github.com/t128n/satteri-reladraw/blob/main/AI_POLICY.md).
+          required: true

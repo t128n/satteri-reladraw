@@ -1,0 +1,53 @@
+name: "🐞 Bug report"
+description: Create a report to help us improve satteri-reladraw
+type: bug
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check existing [issues](https://github.com/t128n/satteri-reladraw/issues) and our [AI Contribution Policy](https://github.com/t128n/satteri-reladraw/blob/main/AI_POLICY.md) before creating a bug report.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is. If you intend to submit a PR for this issue, tell us in the description.
+      placeholder: Bug description
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction diagram / code snippet
+      description: Provide the minimal Markdown or reladraw snippet reproducing the problem.
+      placeholder: |
+        ```reladraw
+        node a "Test"
+        ```
+      render: markdown
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Relevant package versions and runtime environment.
+      placeholder: |
+        - satteri-reladraw: 0.1.0
+        - satteri: 0.10.x
+        - runtime: Bun 1.2 / Node 22
+        - framework: Astro / Starlight (if applicable)
+        - OS: macOS / Linux / Windows
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Error output
+      description: Optional terminal or compiler error logs. Please copy and paste plain text rather than screenshots.
+      render: shell-script
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: If applicable, add any other context or screenshots about the problem here.
