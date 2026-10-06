@@ -22,6 +22,20 @@ export {
   resolveTheme,
 } from "./utils.js";
 export {
+  BUILTIN_THEMES,
+  BUILTIN_THEME_NAMES,
+  DEFAULT_ADDITIONAL_THEMES,
+  createAccent,
+  defineTheme,
+  githubDark,
+  githubLight,
+  mixColors,
+  oxocarbonDark,
+  oxocarbonLight,
+  type Accent,
+  type ThemeDefinition,
+} from "./themes.js";
+export {
   DARK_THEME,
   DEFAULT_THEME,
   THEME_NAMES,

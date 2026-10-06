@@ -1,4 +1,5 @@
 import type { RenderOptions, ResolveOptions, Theme } from "reladraw";
+import type { ThemeDefinition } from "./themes.js";
 
 /**
  * Output rendering mode for reladraw diagrams.
@@ -34,9 +35,18 @@ export interface SatteriReladrawOptions {
 
   /**
    * Default theme name or Theme object for diagrams.
-   * Can be overridden per-diagram via code fence meta (e.g. `theme="light"`).
+   * Can be overridden per-diagram via code fence meta (e.g. `theme="github-dark"`).
    */
-  theme?: string | Theme;
+  theme?: string | Theme | ThemeDefinition;
+
+  /**
+   * Custom themes dictionary mapping theme names to Theme objects or ThemeDefinitions.
+   * Custom themes can be referenced by name in code fence meta (`theme="my-theme"`)
+   * or set as the default `theme` option.
+   *
+   * Can also be used to override built-in themes.
+   */
+  themes?: Record<string, Theme | ThemeDefinition>;
 
   /**
    * CSS class name for wrapper element.

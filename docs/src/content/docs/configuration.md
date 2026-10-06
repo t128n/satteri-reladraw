@@ -7,17 +7,18 @@ description: Complete options reference for satteri-reladraw.
 
 ## Plugin Options
 
-| Option           | Type                                | Default        | Description                                                           |
-| :--------------- | :---------------------------------- | :------------- | :-------------------------------------------------------------------- |
-| `theme`          | `string \| Theme`                   | `undefined`    | Default theme name or custom `Theme` object.                          |
-| `mode`           | `'svg' \| 'element'`                | `'svg'`        | `'svg'` pre-compiles to SVG; `'element'` emits `<reladraw-diagram>`.  |
-| `tag`            | `'div' \| 'figure' \| null`         | `'div'`        | Wrapper container tag. If `null`, no outer wrapper is added.          |
-| `className`      | `string \| null`                    | `'reladraw'`   | CSS class applied to the wrapper container.                           |
-| `languages`      | `string[]`                          | `['reladraw']` | List of code fence languages to match (case-insensitive).             |
-| `onError`        | `'report' \| 'fallback' \| 'throw'` | `'report'`     | Error handling behavior on syntax or layout failure.                  |
-| `renderError`    | `(err, code) => string`             | `undefined`    | Custom HTML formatter for errors when `onError: 'report'`.            |
-| `resolveOptions` | `ResolveOptions`                    | `undefined`    | Layout options passed to reladraw solver (e.g. `margin`, `fontSize`). |
-| `renderOptions`  | `RenderOptions`                     | `undefined`    | Additional rendering options passed to reladraw renderer.             |
+| Option           | Type                                       | Default        | Description                                                           |
+| :--------------- | :----------------------------------------- | :------------- | :-------------------------------------------------------------------- |
+| `theme`          | `string \| Theme \| ThemeDefinition`       | `undefined`    | Default theme name, `Theme` object, or `ThemeDefinition`.             |
+| `themes`         | `Record<string, Theme \| ThemeDefinition>` | `undefined`    | Custom themes registry or overrides for built-in themes.              |
+| `mode`           | `'svg' \| 'element'`                       | `'svg'`        | `'svg'` pre-compiles to SVG; `'element'` emits `<reladraw-diagram>`.  |
+| `tag`            | `'div' \| 'figure' \| null`                | `'div'`        | Wrapper container tag. If `null`, no outer wrapper is added.          |
+| `className`      | `string \| null`                           | `'reladraw'`   | CSS class applied to the wrapper container.                           |
+| `languages`      | `string[]`                                 | `['reladraw']` | List of code fence languages to match (case-insensitive).             |
+| `onError`        | `'report' \| 'fallback' \| 'throw'`        | `'report'`     | Error handling behavior on syntax or layout failure.                  |
+| `renderError`    | `(err, code) => string`                    | `undefined`    | Custom HTML formatter for errors when `onError: 'report'`.            |
+| `resolveOptions` | `ResolveOptions`                           | `undefined`    | Layout options passed to reladraw solver (e.g. `margin`, `fontSize`). |
+| `renderOptions`  | `RenderOptions`                            | `undefined`    | Additional rendering options passed to reladraw renderer.             |
 
 ---
 

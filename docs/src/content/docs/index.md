@@ -23,7 +23,7 @@ hero:
 
 - 🚀 **Compile-Time SVG**: Diagrams are transformed into standalone SVG graphics directly at compile time with zero browser dependencies.
 - 🧩 **Native Sätteri Plugin**: Built for Sätteri's ultra-fast Rust-backed pipeline, supporting both MDAST and HAST plugin architectures.
-- 🎨 **14 Built-In Themes**: Out of the box support for Catppuccin, Dracula, Nord, Vesper, Gruvbox, Solarized, and more.
+- 🎨 **18 Built-In Themes**: Out of the box support for GitHub, Oxocarbon, Catppuccin, Dracula, Nord, Vesper, Gruvbox, Solarized, and more.
 - 📐 **Clean Relative Syntax**: Write diagrams where things go relative to each other — no manual coordinate math, no unpredictable auto-layout.
 
 ## Live Example

@@ -1,4 +1,10 @@
-import { compile, THEMES, type Theme } from "reladraw";
+import { compile, type Theme } from "reladraw";
+import {
+  BUILTIN_THEMES,
+  BUILTIN_THEME_NAMES,
+  defineTheme,
+  type ThemeDefinition,
+} from "./themes.js";
 import type { DiagramMeta, SatteriReladrawOptions } from "./types.js";
 
 /**
@@ -80,14 +86,24 @@ export function renderDefaultError(error: Error, code: string, className?: strin
 }
 
 /**
- * Resolves a theme name or object into a Theme object accepted by reladraw.
+ * Resolves a theme name, Theme object, or ThemeDefinition into a Theme object accepted by reladraw.
  */
-export function resolveTheme(theme: string | Theme | undefined): Theme | undefined {
+export function resolveTheme(
+  theme: string | Theme | ThemeDefinition | undefined,
+  customThemes?: Record<string, Theme | ThemeDefinition>,
+): Theme | undefined {
   if (!theme) return undefined;
   if (typeof theme === "string") {
-    return THEMES[theme];
+    if (customThemes && theme in customThemes) {
+      const custom = customThemes[theme];
+      return typeof custom === "object" ? defineTheme(custom) : undefined;
+    }
+    if (theme in BUILTIN_THEMES) {
+      return BUILTIN_THEMES[theme];
+    }
+    return undefined;
   }
-  return theme;
+  return defineTheme(theme);
 }
 
 /**
@@ -122,7 +138,16 @@ export function renderReladraw(
     innerContent = `<reladraw-diagram${themeAttr}>${escapedCode}</reladraw-diagram>`;
   } else {
     // Mode: svg
-    const resolvedTheme = resolveTheme(rawTheme);
+    const resolvedTheme = resolveTheme(rawTheme, options.themes);
+    if (rawTheme && !resolvedTheme) {
+      const available = [
+        ...(options.themes ? Object.keys(options.themes) : []),
+        ...BUILTIN_THEME_NAMES,
+      ];
+      throw new Error(
+        `Unknown reladraw theme "${String(rawTheme)}". Available themes: ${available.join(", ")}`,
+      );
+    }
     const compileOptions: Record<string, unknown> = {
       ...options.resolveOptions,
       ...options.renderOptions,

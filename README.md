@@ -8,7 +8,8 @@ A [Sätteri](https://satteri.dev) plugin for [reladraw](https://reladraw.dev) di
 
 - **Blazing Fast**: Compiles reladraw diagrams directly to static SVGs during compilation with zero browser dependencies.
 - **Client-Side Mode**: Optional `mode: "element"` emits `<reladraw-diagram>` elements for live in-browser rendering.
-- **Rich Themes**: Supports all 14 built-in reladraw themes (`dark`, `light`, `solarized-dark`, `solarized-light`, `gruvbox-dark`, `gruvbox-light`, `catppuccin-mocha`, `catppuccin-latte`, `nord`, `dracula`, `vesper`, `high-contrast-dark`, `high-contrast-light`, `print`) plus custom theme objects.
+- **Rich Themes**: Supports **18 built-in themes** (all 14 reladraw core themes plus `github-dark`, `github-light`, `oxocarbon-dark`, and `oxocarbon-light`), plus custom theme definitions and overrides via `themes`.
+- **Theme Authoring Utilities**: Helper functions like `defineTheme()`, `createAccent()`, and `mixColors()` to easily build custom palettes.
 - **Code Fence Meta**: Override options per-diagram in Markdown code fences (e.g. `reladraw theme=light title="System Overview"`).
 - **Flexible Containers**: Wrap diagrams in `<div>`, `<figure>` with `<figcaption>`, or omit wrappers entirely.
 - **Robust Error Handling**: Configurable behavior on syntax errors (`report` diagnostics, `fallback` to raw code block, or `throw`).
@@ -115,17 +116,18 @@ Supported meta parameters:
 
 `satteriReladraw(options)` accepts the following options:
 
-| Option           | Type                                | Default        | Description                                                                        |
-| :--------------- | :---------------------------------- | :------------- | :--------------------------------------------------------------------------------- |
-| `theme`          | `string \| Theme`                   | `undefined`    | Default theme name or custom `Theme` object.                                       |
-| `mode`           | `'svg' \| 'element'`                | `'svg'`        | `'svg'` compiles to static SVG; `'element'` outputs `<reladraw-diagram>`.          |
-| `tag`            | `'div' \| 'figure' \| null`         | `'div'`        | Wrapper container tag. If `null`, only raw SVG or `<reladraw-diagram>` is emitted. |
-| `className`      | `string \| null`                    | `'reladraw'`   | CSS class applied to the container.                                                |
-| `languages`      | `string[]`                          | `['reladraw']` | Code fence languages to process (case-insensitive).                                |
-| `onError`        | `'report' \| 'fallback' \| 'throw'` | `'report'`     | Error handling strategy when diagram syntax is invalid.                            |
-| `renderError`    | `(err, code) => string`             | `undefined`    | Custom HTML formatter for errors when `onError: 'report'`.                         |
-| `resolveOptions` | `ResolveOptions`                    | `undefined`    | Additional layout options passed to reladraw solver (e.g. `margin`, `fontSize`).   |
-| `renderOptions`  | `RenderOptions`                     | `undefined`    | Additional rendering options passed to reladraw renderer.                          |
+| Option           | Type                                       | Default        | Description                                                                        |
+| :--------------- | :----------------------------------------- | :------------- | :--------------------------------------------------------------------------------- |
+| `theme`          | `string \| Theme \| ThemeDefinition`       | `undefined`    | Default theme name, `Theme` object, or `ThemeDefinition`.                          |
+| `themes`         | `Record<string, Theme \| ThemeDefinition>` | `undefined`    | Custom themes dictionary or overrides for built-in themes.                         |
+| `mode`           | `'svg' \| 'element'`                       | `'svg'`        | `'svg'` compiles to static SVG; `'element'` outputs `<reladraw-diagram>`.          |
+| `tag`            | `'div' \| 'figure' \| null`                | `'div'`        | Wrapper container tag. If `null`, only raw SVG or `<reladraw-diagram>` is emitted. |
+| `className`      | `string \| null`                           | `'reladraw'`   | CSS class applied to the container.                                                |
+| `languages`      | `string[]`                                 | `['reladraw']` | Code fence languages to process (case-insensitive).                                |
+| `onError`        | `'report' \| 'fallback' \| 'throw'`        | `'report'`     | Error handling strategy when diagram syntax is invalid.                            |
+| `renderError`    | `(err, code) => string`                    | `undefined`    | Custom HTML formatter for errors when `onError: 'report'`.                         |
+| `resolveOptions` | `ResolveOptions`                           | `undefined`    | Additional layout options passed to reladraw solver (e.g. `margin`, `fontSize`).   |
+| `renderOptions`  | `RenderOptions`                            | `undefined`    | Additional rendering options passed to reladraw renderer.                          |
 
 ### Error Handling Strategies
 
