@@ -22,6 +22,9 @@
     "type": "git",
     "url": "git+https://github.com/t128n/satteri-reladraw.git"
   },
+  "workspaces": [
+    "docs"
+  ],
   "files": [
     "dist",
     "README.md",
@@ -49,7 +52,10 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "changeset": "changeset",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "docs:dev": "bun --filter satteri-reladraw-docs dev",
+    "docs:build": "bun run build && bun --filter satteri-reladraw-docs build",
+    "docs:preview": "bun --filter satteri-reladraw-docs preview"
   },
   "dependencies": {
     "reladraw": "^0.16.0"
