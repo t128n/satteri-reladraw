@@ -1,0 +1,68 @@
+{
+  "name": "satteri-reladraw",
+  "version": "0.1.0",
+  "description": "Sätteri plugin for reladraw diagrams",
+  "keywords": [
+    "diagram",
+    "diagrams",
+    "markdown",
+    "mdx",
+    "reladraw",
+    "satteri",
+    "satteri-plugin",
+    "svg"
+  ],
+  "homepage": "https://github.com/t128n/satteri-reladraw#readme",
+  "bugs": {
+    "url": "https://github.com/t128n/satteri-reladraw/issues"
+  },
+  "license": "MIT",
+  "author": "Torben Haack <t128n@ipv4.8shield.net>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t128n/satteri-reladraw.git"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bun run build:js && bun run build:types",
+    "build:js": "bun build src/index.ts --outdir dist --target node --format esm --external satteri --external reladraw",
+    "build:types": "tsc -p tsconfig.build.json",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "changeset": "changeset",
+    "release": "changeset publish"
+  },
+  "dependencies": {
+    "reladraw": "^0.16.0"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3",
+    "@types/bun": "latest",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.87.0",
+    "satteri": "^0.10.5",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "satteri": ">=0.10.0"
+  }
+}

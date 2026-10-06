@@ -1,0 +1,24 @@
+amends "package://github.com/jdx/hk/releases/download/v2.4.0/hk@2.4.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.4.0/hk@2.4.0#/Builtins.pkl"
+
+local test_step = new Step {
+  check = "bun test"
+  glob = List("src/**/*.ts")
+}
+
+steps {
+  ["trailing_whitespace"] = Builtins.trailing_whitespace
+  ["newlines"] = Builtins.newlines
+  ["ox_lint"] = (Builtins.ox_lint) {
+    check = "bunx oxlint --deny-warnings {{files}}"
+    fix = "bunx oxlint --deny-warnings --fix {{files}}"
+  }
+  ["oxfmt"] = (Builtins.oxfmt) {
+    check = "bunx oxfmt --check --no-error-on-unmatched-pattern {{files}}"
+    fix = "bunx oxfmt --write --no-error-on-unmatched-pattern {{files}}"
+  }
+  ["typecheck"] = (Builtins.tsc) {
+    check = "bun run typecheck"
+  }
+  ["test"] = test_step
+}
